@@ -94,16 +94,18 @@
         "balance_dust_level": 0.01
     },
     "api_server": {
-        "enabled": false,
-        "listen_ip_address": "127.0.0.1",
+        "enabled": true,
+        "listen_ip_address": "0.0.0.0",
         "listen_port": 8080,
-        "verbosity": "error",
-        "enable_openapi": false,
-        "jwt_secret_key": "changeme",
-        "ws_token": "changeme",
-        "CORS_origins": [],
-        "username": "",
-        "password": ""
+        "verbosity": "info",
+        "enable_openapi": true,
+        "jwt_secret_key": "freqtrade_secret_key_hetzner_2026",
+        "ws_token": "freqtrade_ws_token_2026",
+        "CORS_origins": [
+            "*"
+        ],
+        "username": "guido",
+        "password": "TradingBot2026!"
     },
     "bot_name": "GridScalpingBot",
     "initial_state": "running",
