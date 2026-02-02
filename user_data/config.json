@@ -1,7 +1,7 @@
 {
-    "max_open_trades": 5,
+    "max_open_trades": 2,
     "stake_currency": "USDT",
-    "stake_amount": 100,
+    "stake_amount": 50,
     "tradable_balance_ratio": 0.99,
     "fiat_display_currency": "USD",
     "dry_run": true,
@@ -36,9 +36,7 @@
         "ccxt_async_config": {},
         "pair_whitelist": [
             "BTC/USDT",
-            "ETH/USDT",
-            "SOL/USDT",
-            "BNB/USDT"
+            "ETH/USDT"
         ],
         "pair_blacklist": []
     },
