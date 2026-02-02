@@ -1,0 +1,53 @@
+# Ignore virtual environment
+.venv/
+venv/
+env/
+
+# Ignore environment variables (CRITICAL - contains API keys)
+.env
+*.env
+!.env.example
+
+# Ignore Freqtrade data
+user_data/data/
+user_data/logs/
+user_data/backtest_results/
+user_data/hyperopt_results/
+user_data/plot/
+*.sqlite
+*.db
+
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Ignore IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Ignore temporary files
+*.tmp
+*.temp
+*.log
+
+# Ignore build files
+build/
+dist/
+*.egg-info/
+
+# Ignore notebooks checkpoints
+.ipynb_checkpoints/
+
+# Keep important examples
+!bot_config/.env.example
