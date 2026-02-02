@@ -10,8 +10,9 @@ RUN apt-get update && apt-get install -y \
   git \
   && rm -rf /var/lib/apt/lists/*
 
-# Install Freqtrade
-RUN pip install --no-cache-dir freqtrade[all]
+# Install Freqtrade (minimal version - no ML/RL to save space)
+# This installs only essential dependencies without PyTorch, TensorFlow, Jupyter
+RUN pip install --no-cache-dir freqtrade
 
 # Copy project files  
 COPY user_data /app/user_data
