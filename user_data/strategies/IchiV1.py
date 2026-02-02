@@ -33,15 +33,27 @@ class IchiV1(IStrategy):
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # Ichimoku Cloud
-        # Default: 9, 26, 52
-        ichi = ta.ICHIMOKU(dataframe)
-        dataframe['tenkan_sen'] = ichi['tenkan_sen']
-        dataframe['kijun_sen'] = ichi['kijun_sen']
-        dataframe['senkou_span_a'] = ichi['senkou_span_a']
-        dataframe['senkou_span_b'] = ichi['senkou_span_b']
-        dataframe['leading_span_a'] = ichi['leading_span_a']
-        dataframe['leading_span_b'] = ichi['leading_span_b']
-        dataframe['chicou_span'] = ichi['chicou_span']
+        # Tenkan-sen (Conversion Line): (9-period high + 9-period low / 2)
+        nine_period_high = dataframe['high'].rolling(window=9).max()
+        nine_period_low = dataframe['low'].rolling(window=9).min()
+        dataframe['tenkan_sen'] = (nine_period_high + nine_period_low) / 2
+
+        # Kijun-sen (Base Line): (26-period high + 26-period low / 2)
+        twenty_six_period_high = dataframe['high'].rolling(window=26).max()
+        twenty_six_period_low = dataframe['low'].rolling(window=26).min()
+        dataframe['kijun_sen'] = (twenty_six_period_high + twenty_six_period_low) / 2
+
+        # Senkou Span A (Leading Span A): (Conversion Line + Base Line) / 2
+        dataframe['senkou_span_a'] = ((dataframe['tenkan_sen'] + dataframe['kijun_sen']) / 2).shift(26)
+
+        # Senkou Span B (Leading Span B): (52-period high + 52-period low / 2)
+        fifty_two_period_high = dataframe['high'].rolling(window=52).max()
+        fifty_two_period_low = dataframe['low'].rolling(window=52).min()
+        dataframe['senkou_span_b'] = ((fifty_two_period_high + fifty_two_period_low) / 2).shift(26)
+
+        # Leading Spans
+        dataframe['leading_span_a'] = dataframe['senkou_span_a'].shift(26)
+        dataframe['leading_span_b'] = dataframe['senkou_span_b'].shift(26)
 
         # Cloud top and bottom
         dataframe['cloud_green'] = (dataframe['senkou_span_a'] > dataframe['senkou_span_b'])
