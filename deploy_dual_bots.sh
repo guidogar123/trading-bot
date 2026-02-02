@@ -42,7 +42,7 @@ docker run -d \
     -e TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID} \
     -v $(pwd)/user_data:/app/user_data \
     trading-bot \
-    freqtrade trade --config user_data/config_binance.json --strategy GridScalpingHybrid
+    freqtrade trade --config user_data/config_binance.json --strategy IchiV1
 
 # Wait for containers to start
 echo "⏳ Waiting for bots to initialize..."

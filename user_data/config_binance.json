@@ -102,6 +102,7 @@
         "password": "BinanceBot2026!"
     },
     "bot_name": "BinanceBot",
+    "strategy": "IchiV1",
     "initial_state": "running",
     "force_entry_enable": false,
     "internals": {
