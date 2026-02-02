@@ -5,17 +5,16 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+  build-essential \
+  curl \
+  git \
+  && rm -rf /var/lib/apt/lists/*
 
 # Install Freqtrade
 RUN pip install --no-cache-dir freqtrade[all]
 
 # Copy project files  
 COPY user_data /app/user_data
-COPY .env /app/.env
 
 # Create data directory
 RUN mkdir -p /app/user_data/data
