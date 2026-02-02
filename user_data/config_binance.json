@@ -68,7 +68,7 @@
         "remove_pumps": false
     },
     "telegram": {
-        "enabled": true,
+        "enabled": false,
         "token": "8404087496:AAHhLD-2-Wc2NJwMxJX_T2hJgC8uSzy1Qjw",
         "chat_id": "909537175",
         "notification_settings": {
