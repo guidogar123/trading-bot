@@ -25,6 +25,7 @@ echo "▶️ Starting Bybit bot..."
 docker run -d \
     --name freqtrade-bot \
     --restart unless-stopped \
+    --dns 8.8.8.8 \
     -p 8080:8080 \
     --env-file .env \
     -v $(pwd)/user_data:/app/user_data \
@@ -35,6 +36,7 @@ echo "▶️ Starting Binance bot..."
 docker run -d \
     --name binance-bot \
     --restart unless-stopped \
+    --dns 8.8.8.8 \
     -p 8081:8081 \
     -e EXCHANGE_API_KEY=${BINANCE_API_KEY} \
     -e EXCHANGE_SECRET=${BINANCE_API_SECRET} \

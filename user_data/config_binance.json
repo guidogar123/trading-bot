@@ -103,6 +103,7 @@
     },
     "bot_name": "BinanceBot",
     "strategy": "IchiV1",
+    "db_url": "sqlite:///user_data/tradesv3_binance.sqlite",
     "initial_state": "running",
     "force_entry_enable": false,
     "internals": {

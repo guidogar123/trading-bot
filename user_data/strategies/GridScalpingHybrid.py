@@ -75,11 +75,10 @@ class GridScalpingHybrid(IStrategy):
         # RSI - Relative Strength Index
         dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
         
-        # MACD - Moving Average Convergence Divergence  
+        # MACD
         macd = ta.MACD(dataframe)
         dataframe['macd'] = macd['macd']
         dataframe['macdsignal'] = macd['macdsignal']
-        dataframe['macdhist'] = macd['macdhist']
         
         # Bollinger Bands
         bollinger = ta.BBANDS(dataframe, timeperiod=20)
@@ -87,50 +86,54 @@ class GridScalpingHybrid(IStrategy):
         dataframe['bb_middleband'] = bollinger['middleband']
         dataframe['bb_upperband'] = bollinger['upperband']
         
-        # EMA - Exponential Moving Average
+        # EMA
         dataframe['ema20'] = ta.EMA(dataframe, timeperiod=20)
         dataframe['ema50'] = ta.EMA(dataframe, timeperiod=50)
+        dataframe['ema200'] = ta.EMA(dataframe, timeperiod=200)
         
-        # ATR - Average True Range (for volatility)
+        # ADX - Average Directional Index (Trend Strength)
+        dataframe['adx'] = ta.ADX(dataframe, timeperiod=14)
+        
+        # ATR - Average True Range (Volatility)
         dataframe['atr'] = ta.ATR(dataframe, timeperiod=14)
         
         # Volume
         dataframe['volume_ma'] = dataframe['volume'].rolling(window=20).mean()
         
-        # Grid levels calculation
-        dataframe['grid_lower'] = dataframe['close'] * (1 - self.grid_spacing.value)
-        dataframe['grid_upper'] = dataframe['close'] * (1 + self.grid_spacing.value)
+        # Grid levels calculation based on ATR (more dynamic)
+        dataframe['grid_lower'] = dataframe['close'] - (dataframe['atr'] * 1.5)
+        dataframe['grid_upper'] = dataframe['close'] + (dataframe['atr'] * 1.5)
         
         return dataframe
     
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
-        Define buy signals based on indicators
-        Combines Grid and Scalping logic
+        Define buy signals
         """
         conditions = []
         
-        # SCALPING SIGNALS (for volatile markets)
-        # Buy when RSI oversold + MACD crossover + price below EMA
+        # Trend Filter: Only Buy above EMA 200
+        conditions.append(dataframe['close'] > dataframe['ema200'])
+
+        # ADX Logic:
+        # If ADX > 25: Strong Trend (Priority to Scalping)
+        # If ADX < 25: Ranging (Priority to Grid)
+        
         scalping_buy = (
-            (dataframe['rsi'] < self.buy_rsi.value) &
+            (dataframe['adx'] > 25) &
+            (dataframe['rsi'] < 35) &
             (dataframe['macd'] > dataframe['macdsignal']) &
-            (dataframe['close'] < dataframe['ema20']) &
             (dataframe['volume'] > dataframe['volume_ma'])
         )
         
-        # GRID SIGNALS (for ranging markets)
-        # Buy at lower grid level when price is ranging
         grid_buy = (
+            (dataframe['adx'] <= 25) &
             (dataframe['close'] <= dataframe['grid_lower']) &
-            (dataframe['rsi'] > 30) & (dataframe['rsi'] < 50) &  # Not too oversold
-            (dataframe['close'] > dataframe['bb_lowerband'])  # Not too extended
+            (dataframe['rsi'] > 30) & (dataframe['rsi'] < 45)
         )
         
-        # COMBINED: Either scalping OR grid signal
         conditions.append(scalping_buy | grid_buy)
         
-        # Only buy if we have a signal
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
@@ -140,28 +143,24 @@ class GridScalpingHybrid(IStrategy):
     
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
-        Define sell signals based on indicators
+        Define sell signals
         """
         conditions = []
         
-        # SCALPING EXIT
-        # Sell when RSI overbought OR MACD crossover down
-        scalping_sell = (
-            (dataframe['rsi'] > self.sell_rsi.value) |
-            (dataframe['macd'] < dataframe['macdsignal'])
+        # Exit based on overbought RSI OR reverse crossover OR price hitting upper grid
+        scalping_exit = (
+            (dataframe['adx'] > 25) &
+            ((dataframe['rsi'] > 75) | (dataframe['macd'] < dataframe['macdsignal']))
         )
         
-        # GRID EXIT
-        # Sell at upper grid level
-        grid_sell = (
+        grid_exit = (
+            (dataframe['adx'] <= 25) &
             (dataframe['close'] >= dataframe['grid_upper']) &
-            (dataframe['rsi'] > 50)
+            (dataframe['rsi'] > 55)
         )
         
-        # COMBINED: Either scalping OR grid exit
-        conditions.append(scalping_sell | grid_sell)
+        conditions.append(scalping_exit | grid_exit)
         
-        # Only sell if we have a signal
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),

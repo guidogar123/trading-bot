@@ -113,6 +113,7 @@
         "password": "TradingBot2026!"
     },
     "bot_name": "GridScalpingBot",
+    "db_url": "sqlite:///user_data/tradesv3.sqlite",
     "initial_state": "running",
     "force_entry_enable": false,
     "internals": {
